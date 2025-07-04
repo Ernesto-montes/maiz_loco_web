@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Maíz Loco Tajín y Limón</title>
+  <!-- Reemplaza TU_CLIENT_ID_DE_PAYPAL por tu Client ID real -->
+  <script src="https://paypal.me/Ernestomontes17?country.x=MX&locale.x=es_XC"></script>
   <style>
     body {
       margin: 0;
@@ -121,6 +123,27 @@
       color: green;
       white-space: pre-line;
     }
+
+    .floating-cart {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ff6600;
+      color: white;
+      border-radius: 50px;
+      padding: 10px 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .floating-cart img {
+      height: 30px;
+    }
   </style>
 </head>
 <body>
@@ -139,12 +162,12 @@
 
   <section class="hero">
     <h1>¡Maíz Loco sabor Tajín y Limón!</h1>
-    <p>¡Pica, truena y enamora!.</p>
+    <p>¡Pica, truena y enamora!</p>
   </section>
 
   <section id="producto" class="contenido">
     <h2>¿Qué es Maíz Loco?</h2>
-    <p>Es una versión especial de nuestras palomitas locas, preparadas con ingredientes selectos que mezclan lo ácido y lo picante: el auténtico sabor mexicano en cada bocado.</p>
+    <p>Palomitas locas con Tajín y Limón: explosión de sabor ácido, picante y delicioso. Una botana mexicana inolvidable.</p>
   </section>
 
   <section id="ingredientes" class="contenido">
@@ -153,7 +176,6 @@
       <li>Palomitas naturales</li>
       <li>Polvo Tajín</li>
       <li>Jugo de limón natural</li>
-     
       <li>Toques secretos de la casa</li>
     </ul>
   </section>
@@ -187,8 +209,9 @@
       <label>Comentario o especificaciones:
         <textarea name="comentario"></textarea>
       </label>
-      <button type="submit">Realizar Pedido</button>
+      <button type="submit">Enviar por WhatsApp</button>
     </form>
+    <div id="paypal-button-container" style="margin-top: 30px;"></div>
     <div id="mensaje-envio"></div>
   </section>
 
@@ -196,23 +219,31 @@
     <p>&copy; 2025 Maíz Loco. Sabor Tajín y Limón. Todos los derechos reservados.</p>
   </footer>
 
+  <div class="floating-cart" onclick="window.location='#carrito'">
+    <img src="logo-maizloco.png.jpg" alt="Carrito Logo">
+    <span id="floating-total">$0.00</span>
+  </div>
+
   <script>
     let carrito = [];
     const precioUnitario = 10.0;
 
     function agregarAlCarrito() {
-      carrito.push({ nombre: "Maíz Loco Tajín × Limón", precio: precioUnitario });
+      carrito.push({ nombre: "Maíz Loco Tajín y Limón", precio: precioUnitario });
       actualizarCarrito();
     }
 
     function actualizarCarrito() {
       const lista = document.getElementById("lista-carrito");
       const totalElement = document.getElementById("total");
+      const floatingTotal = document.getElementById("floating-total");
       lista.innerHTML = "";
 
       if (carrito.length === 0) {
         lista.innerHTML = "<p>No hay productos en el carrito.</p>";
         totalElement.textContent = "$0.00";
+        floatingTotal.textContent = "$0.00";
+        renderizarPayPal();
         return;
       }
 
@@ -224,26 +255,70 @@
 
       const total = carrito.reduce((acc, item) => acc + item.precio, 0);
       totalElement.textContent = `$${total.toFixed(2)} MXN`;
+      floatingTotal.textContent = `$${total.toFixed(2)} MXN`;
+
+      renderizarPayPal();
     }
 
     function enviarFormulario(event) {
       event.preventDefault();
       const form = document.getElementById("formCompra");
       const datos = new FormData(form);
+      const nombre = datos.get("nombre");
+      const telefono = datos.get("telefono");
+      const direccion = datos.get("direccion");
+      const comentario = datos.get("comentario");
+      const total = carrito.reduce((acc, item) => acc + item.precio, 0).toFixed(2);
 
       const mensaje = `
 ✅ ¡Pedido enviado!
-📦 Nombre: ${datos.get("nombre")}
-📱 Tel: ${datos.get("telefono")}
-🏠 Dirección: ${datos.get("direccion")}
-📝 Comentario: ${datos.get("comentario")}
-🛒 Total: $${carrito.reduce((acc, item) => acc + item.precio, 0).toFixed(2)} MXN
+📦 Nombre: ${nombre}
+📱 Tel: ${telefono}
+🏠 Dirección: ${direccion}
+📝 Comentario: ${comentario}
+🛒 Total: $${total} MXN
       `;
 
       document.getElementById("mensaje-envio").innerText = mensaje;
+
+      // WhatsApp (reemplaza por tu número real, con código país y sin +)
+      const textoWhatsApp = encodeURIComponent(`Hola, quiero hacer un pedido:\n\n${mensaje}`);
+      const telefonoDestino = "5213329162407"; // Cambia aquí tu número real con código país (ejemplo: 5215551234567)
+      window.open(`https://wa.me/${telefonoDestino}?text=${textoWhatsApp}`, "_blank");
+
       form.reset();
       carrito = [];
       actualizarCarrito();
+    }
+
+    function renderizarPayPal() {
+      const total = carrito.reduce((acc, item) => acc + item.precio, 0);
+
+      const container = document.getElementById("paypal-button-container");
+      container.innerHTML = "";
+
+      if (total > 0) {
+        paypal.Buttons({
+          createOrder: function(data, actions) {
+            return actions.order.create({
+              purchase_units: [{
+                amount: {
+                  value: total.toFixed(2),
+                  currency_code: "MXN"
+                },
+                description: "Compra de Maíz Loco Tajín y Limón"
+              }]
+            });
+          },
+          onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+              alert('✅ Pago completado por ' + details.payer.name.given_name);
+              carrito = [];
+              actualizarCarrito();
+            });
+          }
+        }).render('#paypal-button-container');
+      }
     }
   </script>
 </body>
