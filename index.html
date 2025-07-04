@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Maíz Loco Tajín y Limón</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #fffbe6;
+      color: #333;
+    }
+
+    header {
+      background: #ff6600;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      height: 60px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+      padding: 0;
+      margin: 0;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .hero {
+      background: linear-gradient(to right, #ff9966, #ff5e62);
+      padding: 50px 20px;
+      text-align: center;
+      color: white;
+    }
+
+    .contenido {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .ingredientes li {
+      margin-bottom: 10px;
+    }
+
+    .precio {
+      text-align: center;
+    }
+
+    .precio-texto {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #d10000;
+      font-weight: bold;
+    }
+
+    button {
+      background-color: #ff6600;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #cc5200;
+    }
+
+    .carrito {
+      background-color: #fff0d6;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .total-carrito {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .formulario label {
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+    }
+
+    footer {
+      background: #ff6600;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+    }
+
+    #mensaje-envio {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo-maizloco.png" alt="Maíz Loco Logo" class="logo" />
+    <nav>
+      <ul>
+        <li><a href="#producto">Producto</a></li>
+        <li><a href="#ingredientes">Ingredientes</a></li>
+        <li><a href="#precio">Precio</a></li>
+        <li><a href="#carrito">Carrito</a></li>
+        <li><a href="#formulario">Compra</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>¡Maíz Loco sabor Tajín y Limón!</h1>
+    <p>¡Pica, truena y enamora!.</p>
+  </section>
+
+  <section id="producto" class="contenido">
+    <h2>¿Qué es Maíz Loco?</h2>
+    <p>Es una versión especial de nuestras palomitas locas, preparadas con ingredientes selectos que mezclan lo ácido y lo picante: el auténtico sabor mexicano en cada bocado.</p>
+  </section>
+
+  <section id="ingredientes" class="contenido">
+    <h2>Ingredientes</h2>
+    <ul class="ingredientes">
+      <li>Palomitas naturales</li>
+      <li>Polvo Tajín</li>
+      <li>Jugo de limón natural</li>
+     
+      <li>Toques secretos de la casa</li>
+    </ul>
+  </section>
+
+  <section id="precio" class="contenido precio">
+    <h2>Precio</h2>
+    <p class="precio-texto">$10.00 MXN por porción</p>
+    <button onclick="agregarAlCarrito()">Agregar al carrito</button>
+  </section>
+
+  <section id="carrito" class="contenido carrito">
+    <h2>Carrito de Compras</h2>
+    <div id="lista-carrito">
+      <p>No hay productos en el carrito.</p>
+    </div>
+    <p class="total-carrito">Total: <span id="total">$0.00</span></p>
+  </section>
+
+  <section id="formulario" class="contenido formulario">
+    <h2>Formulario de Compra</h2>
+    <form id="formCompra" onsubmit="enviarFormulario(event)">
+      <label>Nombre Completo:
+        <input type="text" name="nombre" required />
+      </label>
+      <label>Teléfono:
+        <input type="tel" name="telefono" required />
+      </label>
+      <label>Dirección de Entrega:
+        <textarea name="direccion" required></textarea>
+      </label>
+      <label>Comentario o especificaciones:
+        <textarea name="comentario"></textarea>
+      </label>
+      <button type="submit">Realizar Pedido</button>
+    </form>
+    <div id="mensaje-envio"></div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Maíz Loco. Sabor Tajín y Limón. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    let carrito = [];
+    const precioUnitario = 35.0;
+
+    function agregarAlCarrito() {
+      carrito.push({ nombre: "Maíz Loco Tajín × Limón", precio: precioUnitario });
+      actualizarCarrito();
+    }
+
+    function actualizarCarrito() {
+      const lista = document.getElementById("lista-carrito");
+      const totalElement = document.getElementById("total");
+      lista.innerHTML = "";
+
+      if (carrito.length === 0) {
+        lista.innerHTML = "<p>No hay productos en el carrito.</p>";
+        totalElement.textContent = "$0.00";
+        return;
+      }
+
+      carrito.forEach((item) => {
+        const div = document.createElement("div");
+        div.textContent = `${item.nombre} - $${item.precio.toFixed(2)} MXN`;
+        lista.appendChild(div);
+      });
+
+      const total = carrito.reduce((acc, item) => acc + item.precio, 0);
+      totalElement.textContent = `$${total.toFixed(2)} MXN`;
+    }
+
+    function enviarFormulario(event) {
+      event.preventDefault();
+      const form = document.getElementById("formCompra");
+      const datos = new FormData(form);
+
+      const mensaje = `
+✅ ¡Pedido enviado!
+📦 Nombre: ${datos.get("nombre")}
+📱 Tel: ${datos.get("telefono")}
+🏠 Dirección: ${datos.get("direccion")}
+📝 Comentario: ${datos.get("comentario")}
+🛒 Total: $${carrito.reduce((acc, item) => acc + item.precio, 0).toFixed(2)} MXN
+      `;
+
+      document.getElementById("mensaje-envio").innerText = mensaje;
+      form.reset();
+      carrito = [];
+      actualizarCarrito();
+    }
+  </script>
+</body>
+</html>
